@@ -2,11 +2,19 @@ package com.primefootball.postservice.dtos
 
 import com.primefootball.postservice.models.Post
 import java.io.Serializable
-import java.util.*
 
-data class PostDto(val id: String? = null, val text: String? = null) : Serializable
+data class PostDto(
+    open val id: String? = null,
+    open val text: String,
+    open val posterId: String,
+    open var file: String,
+    open var timestamp: String? = null
+) : Serializable
 
 fun PostDto.toPost() = Post(
-    id = id?.toLong(),
-    text = text
+    id?.toLong(),
+    text,
+    posterId,
+    file,
+    timestamp
 )
