@@ -7,13 +7,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class MessageConsumer(private val postService: PostService) {
-    var gson = Gson()
+    private val gson = Gson()
 
     @RabbitListener(queues = [MessagingConfig.RECEIVER_QUEUE])
-    fun consumeMessageFromQueue(userId: String): String? {
-        println("Message received from queue: $userId")
-        var json = gson.toJson(postService.getPostsFromFollowedPeople(userId))
-        println("json to return: $json")
-        return json
-    }
+    fun consumeMessageFromQueue(userId: String): String? = gson.toJson(postService.getPostsFromFollowedPeople(userId))
 }

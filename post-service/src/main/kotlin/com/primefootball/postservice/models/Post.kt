@@ -6,7 +6,6 @@ import com.primefootball.postservice.dtos.UserDto
 import javax.persistence.*
 
 @Entity
-@Table(name = "post")
 open class Post(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,7 +18,7 @@ open class Post(
 )
 
 fun Post.toPostDto() = PostDto(
-    id.toString(),
+    id,
     text,
     posterId,
     file,

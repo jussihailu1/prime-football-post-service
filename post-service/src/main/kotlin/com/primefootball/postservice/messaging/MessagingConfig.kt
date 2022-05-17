@@ -31,8 +31,8 @@ class MessagingConfig {
     }
 
     @Bean
-    fun template(connectionFactory: ConnectionFactory?): AmqpTemplate {
-        val rabbitTemplate = RabbitTemplate(connectionFactory!!)
+    fun template(connectionFactory: ConnectionFactory): AmqpTemplate {
+        val rabbitTemplate = RabbitTemplate(connectionFactory)
         rabbitTemplate.messageConverter = converter()
         return rabbitTemplate
     }
