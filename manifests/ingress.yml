@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: "primefootballcluster-97fc"
+    labels:
+        app: "primefootballcluster-97fc"
+    annotations:
+        kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+    rules:
+        - host: prime-football-cluster-primefootballcluster-97fc.6009514c28334dd79e7a.westeurope.aksapp.io
+          http:
+            paths:
+            - path: /
+              backend:
+                serviceName: "primefootballcluster-97fc"
+                servicePort: 80
