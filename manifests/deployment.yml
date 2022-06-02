@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "primefootballcluster-97fc"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "primefootballcluster-97fc"
+  template:
+    metadata:
+      labels:
+        app: "primefootballcluster-97fc"
+    spec:
+      containers:
+        - name: "primefootballcluster-97fc"
+          image: "primefootballregistry.azurecr.io/primefootballcluster"
+          ports:
+          - containerPort: 80
