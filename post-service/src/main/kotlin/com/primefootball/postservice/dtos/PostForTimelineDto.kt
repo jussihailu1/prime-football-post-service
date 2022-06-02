@@ -1,11 +1,12 @@
 package com.primefootball.postservice.dtos
 
 import java.io.Serializable
+import java.util.*
 
 data class PostForTimelineDto(
-    val id: String? = null,
+    val id: UUID,
     val text: String,
     val user: UserDto,
     var file: String,
-    var timestamp: String? = null
+    var timestamp: String
 ) : Serializable

@@ -38,7 +38,6 @@ dependencies {
 	testImplementation("org.testcontainers:testcontainers:1.17.1")
 	testImplementation("org.testcontainers:junit-jupiter:1.17.1")
 	testImplementation ("org.testcontainers:mysql:1.17.1")
-	testImplementation("io.mockk:mockk:1.12.4")
 }
 
 tasks.withType<KotlinCompile> {

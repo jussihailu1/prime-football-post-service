@@ -1,6 +1,5 @@
 package com.primefootball.postservice.services
 
-import com.primefootball.postservice.PostServiceApplicationTests.Companion.container
 import com.primefootball.postservice.dtos.PostDto
 import com.primefootball.postservice.repositories.PostRepository
 import org.assertj.core.api.Assertions.assertThat
