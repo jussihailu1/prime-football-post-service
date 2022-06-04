@@ -33,26 +33,16 @@ stages:
       pool:
         vmImage: $(vmImageName)
       steps:
-        - task: Gradle@3
-          displayName: Build jar package
-          inputs:
-            gradleWrapperFile: 'post-service/gradlew'
-            workingDirectory: 'post-service'
-            tasks: 'build'
-            publishJUnitResults: true
-            testResultsFiles: '**/TEST-*.xml'
-            codeCoverageToolOption: 'JaCoCo'
-            codeCoverageClassFilesDirectories: 'build/classes/main/'
-            javaHomeOption: 'JDKVersion'
-            sonarQubeRunAnalysis: true
-            sqGradlePluginVersionChoice: 'specify'
-            sonarQubeGradlePluginVersion: '2.6.1'
-            checkStyleRunAnalysis: true
-            findBugsRunAnalysis: true
-            pmdRunAnalysis: true
-            spotBugsAnalysis: true
-            spotBugsGradlePluginVersionChoice: 'specify'
-            spotbugsGradlePluginVersion: '4.7.0'
+      - task: Gradle@3
+        inputs:
+          gradleWrapperFile: 'gradlew'
+          workingDirectory: 'post-service'
+          tasks: 'build'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          javaHomeOption: 'JDKVersion'
+          sonarQubeRunAnalysis: false
+          spotBugsAnalysis: false
 
 - stage: Docker_build_stage
   displayName: Docker build
