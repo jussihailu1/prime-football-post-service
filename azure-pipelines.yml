@@ -26,8 +26,37 @@ variables:
 
 stages:
 - stage: Build
-  displayName: Docker build
+  displayName: Gradle build
   jobs:
+    - job: Build
+      displayName: Gradle build job
+      pool:
+        vmImage: $(vmImageName)
+      steps:
+        - task: Gradle@3
+          displayName: Build jar package
+          inputs:
+            gradleWrapperFile: 'gradlew'
+            workingDirectory: '/post-service'
+            tasks: 'build'
+            publishJUnitResults: true
+            testResultsFiles: '**/TEST-*.xml'
+            codeCoverageToolOption: 'JaCoCo'
+            codeCoverageClassFilesDirectories: 'build/classes/main/'
+            javaHomeOption: 'JDKVersion'
+            sonarQubeRunAnalysis: true
+            sqGradlePluginVersionChoice: 'specify'
+            sonarQubeGradlePluginVersion: '2.6.1'
+            checkStyleRunAnalysis: true
+            findBugsRunAnalysis: true
+            pmdRunAnalysis: true
+            spotBugsAnalysis: true
+            spotBugsGradlePluginVersionChoice: 'specify'
+            spotbugsGradlePluginVersion: '4.7.0'
+
+- stage: Build
+  displayName: Docker build
+  jobs:  
   - job: Build
     displayName: Build
     pool:
