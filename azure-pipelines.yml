@@ -25,7 +25,7 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
-- stage: Build
+- stage: Gradle build stage
   displayName: Gradle build
   jobs:
     - job: Build
@@ -54,11 +54,11 @@ stages:
             spotBugsGradlePluginVersionChoice: 'specify'
             spotbugsGradlePluginVersion: '4.7.0'
 
-- stage: Build
+- stage: Docker build stage
   displayName: Docker build
   jobs:  
   - job: Build
-    displayName: Build
+    displayName: Docker build job
     pool:
       vmImage: $(vmImageName)
     steps:
