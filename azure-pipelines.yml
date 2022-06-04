@@ -36,7 +36,7 @@ stages:
         - task: Gradle@3
           displayName: Build jar package
           inputs:
-            gradleWrapperFile: 'gradlew'
+            gradleWrapperFile: '/post-service/gradlew'
             workingDirectory: '/post-service'
             tasks: 'build'
             publishJUnitResults: true
