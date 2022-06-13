@@ -27,7 +27,7 @@ variables:
 stages:
 - stage: SonarQube_prepare
   jobs:
-  - job: SonarQube-Prepare
+  - job: Prepare
     pool:
       name: Default
     steps:
@@ -61,7 +61,7 @@ stages:
 
 - stage: SonarQube_publish
   jobs:
-  - job: SonarQube-Publish
+  - job: Publish
     pool:
       name: Default
     steps:
