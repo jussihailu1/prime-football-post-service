@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "pfcluster-dd53"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "pfcluster-dd53"
+  template:
+    metadata:
+      labels:
+        app: "pfcluster-dd53"
+    spec:
+      containers:
+        - name: "pfcluster-dd53"
+          image: "primefootballregistry.azurecr.io/pfcluster"
+          ports:
+          - containerPort: 80
