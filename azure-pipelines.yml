@@ -25,6 +25,22 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
+# - stage: SonarQube_prepare
+#   jobs:
+#   - job: Prepare
+#     pool:
+#       name: Default
+#     steps:
+#     - checkout: self
+#       clean: true
+#     - task: SonarQubePrepare@5
+#       displayName: Prepare analysis on SonarQube
+#       inputs:
+#         SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
+#         scannerMode: Other
+#         extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
+
+
 - stage: Gradle_build_stage
   displayName: Gradle build
   jobs:
@@ -41,8 +57,16 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           javaHomeOption: 'JDKVersion'
-          sonarQubeRunAnalysis: false
-          spotBugsAnalysis: false
+          sonarQubeRunAnalysis: true
+
+# - stage: SonarQube_publish
+#   jobs:
+#   - job: Publish
+#     pool:
+#       name: Default
+#     steps:
+#     - task: SonarQubePublish@5
+#       displayName: Publish Quality Gate Result
 
 - stage: Docker_build_stage
   displayName: Docker build
