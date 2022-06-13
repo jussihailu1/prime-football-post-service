@@ -25,17 +25,17 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
-- stage: SonarQube Prepare
-  jobs:
-  - job: SonarQube-Prepare
-    pool:
-      name: Default
-    steps:
-      - task: SonarQubePrepare@5
-        inputs:
-          SonarQube: 'Prime-Football Azure pipeline SonarQube connection'
-          scannerMode: 'Other'
-          extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
+# - stage: SonarQube Prepare
+#   jobs:
+#   - job: SonarQube-Prepare
+#     pool:
+#       name: Default
+#     steps:
+#       - task: SonarQubePrepare@5
+#         inputs:
+#           SonarQube: 'Prime-Football Azure pipeline SonarQube connection'
+#           scannerMode: 'Other'
+#           extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
 
 - stage: Gradle_build_stage
   displayName: Gradle build
@@ -43,28 +43,29 @@ stages:
     - job: Build
       displayName: Gradle build job
       pool:
-        vmImage: $(vmImageName)
+        # vmImage: $(vmImageName)
+        vmImage: Default
       steps:
       - task: Gradle@3
         inputs:
           gradleWrapperFile: 'post-service/gradlew'
           workingDirectory: 'post-service'
-          tasks: 'build'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          javaHomeOption: 'JDKVersion'
+          # tasks: 'build'
+          # publishJUnitResults: true
+          # testResultsFiles: '**/TEST-*.xml'
+          # javaHomeOption: 'JDKVersion'
           sonarQubeRunAnalysis: true
-          spotBugsAnalysis: false
+          # spotBugsAnalysis: false
 
-- stage: SonarQube Publish
-  jobs:
-  - job: SonarQube-Publish
-    pool:
-      name: Default
-    steps:
-      - task: SonarQubePublish@5
-        inputs:
-          pollingTimeoutSec: '300'
+# - stage: SonarQube Publish
+#   jobs:
+#   - job: SonarQube-Publish
+#     pool:
+#       name: Default
+#     steps:
+#       - task: SonarQubePublish@5
+#         inputs:
+#           pollingTimeoutSec: '300'
 
 - stage: Docker_build_stage
   displayName: Docker build
