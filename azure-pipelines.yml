@@ -25,6 +25,18 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
+- stage: SonarQube Prepare
+  jobs:
+  - job: SonarQube-Prepare
+    pool:
+      name: Default
+    steps:
+      - task: SonarQubePrepare@5
+        inputs:
+          SonarQube: 'Prime-Football Azure pipeline SonarQube connection'
+          scannerMode: 'Other'
+          extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
+
 - stage: Gradle_build_stage
   displayName: Gradle build
   jobs:
@@ -33,15 +45,6 @@ stages:
       pool:
         vmImage: $(vmImageName)
       steps:
-      - task: SonarQubePrepare@5
-        inputs:
-          SonarQube: 'http://localhost:9000'
-          scannerMode: 'Other'
-          extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
-      - task: SonarQubePublish@5
-        inputs:
-          pollingTimeoutSec: '300'
-
       - task: Gradle@3
         inputs:
           gradleWrapperFile: 'post-service/gradlew'
@@ -50,8 +53,18 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           javaHomeOption: 'JDKVersion'
-          sonarQubeRunAnalysis: false
+          sonarQubeRunAnalysis: true
           spotBugsAnalysis: false
+
+- stage: SonarQube Publish
+  jobs:
+  - job: SonarQube-Publish
+    pool:
+      name: Default
+    steps:
+      - task: SonarQubePublish@5
+        inputs:
+          pollingTimeoutSec: '300'
 
 - stage: Docker_build_stage
   displayName: Docker build
