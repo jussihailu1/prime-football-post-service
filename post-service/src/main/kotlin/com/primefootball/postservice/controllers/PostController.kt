@@ -4,8 +4,11 @@ import com.primefootball.postservice.dtos.PostDto
 import com.primefootball.postservice.services.PostService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
+@CrossOrigin
 @RestController
 @RequestMapping("/posts")
 class PostController(private val postService: PostService) {
@@ -26,7 +29,7 @@ class PostController(private val postService: PostService) {
                 text = "Lorem ipsum dolor sit amet.",
                 posterId = postService.tempUsersList[i],
                 file = "some file",
-                timestamp = "some timestamp"
+                timestamp = LocalDateTime.now().plusHours(i.toLong()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
             )
         )
 
