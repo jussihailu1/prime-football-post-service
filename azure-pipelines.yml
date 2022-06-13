@@ -54,9 +54,9 @@ stages:
           gradleWrapperFile: 'post-service/gradlew'
           workingDirectory: 'post-service'
           tasks: 'build'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          javaHomeOption: 'JDKVersion'
+          # publishJUnitResults: true
+          # testResultsFiles: '**/TEST-*.xml'
+          # javaHomeOption: 'JDKVersion'
           sonarQubeRunAnalysis: true
 
 - stage: SonarQube_publish
