@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: "pfcluster-dd53"
+    labels:
+        app: "pfcluster-dd53"
+    annotations:
+        kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+    rules:
+        - host: default-pfcluster-dd53.39ccf34fff9944969bf7.westeurope.aksapp.io
+          http:
+            paths:
+            - path: /
+              backend:
+                serviceName: "pfcluster-dd53"
+                servicePort: 80
