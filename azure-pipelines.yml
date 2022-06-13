@@ -25,7 +25,7 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
-- stage: SonarQube Prepare
+- stage: SonarQube_prepare
   jobs:
   - job: SonarQube-Prepare
     pool:
@@ -59,7 +59,7 @@ stages:
           javaHomeOption: 'JDKVersion'
           sonarQubeRunAnalysis: true
 
-- stage: SonarQube Publish
+- stage: SonarQube_publish
   jobs:
   - job: SonarQube-Publish
     pool:
