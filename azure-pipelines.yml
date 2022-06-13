@@ -25,17 +25,19 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
-# - stage: SonarQube Prepare
-#   jobs:
-#   - job: SonarQube-Prepare
-#     pool:
-#       name: Default
-#     steps:
-#       - task: SonarQubePrepare@5
-#         inputs:
-#           SonarQube: 'Prime-Football Azure pipeline SonarQube connection'
-#           scannerMode: 'Other'
-#           extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
+- stage: SonarQube Prepare
+  jobs:
+  - job: SonarQube-Prepare
+    pool:
+      name: Default
+    steps:
+    - task: SonarSource.sonarqube.15B84CA1-B62F-4A2A-A403-89B77A063157.SonarQubePrepare@5
+      displayName: 'Prepare analysis on SonarQube'
+      inputs:
+        SonarQube: 'Prime-Football Azure pipeline SonarQube connection'
+        scannerMode: Other
+        extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
+
 
 - stage: Gradle_build_stage
   displayName: Gradle build
@@ -43,19 +45,17 @@ stages:
     - job: Build
       displayName: Gradle build job
       pool:
-        # vmImage: $(vmImageName)
-        vmImage: Default
+        vmImage: $(vmImageName)
       steps:
       - task: Gradle@3
         inputs:
           gradleWrapperFile: 'post-service/gradlew'
           workingDirectory: 'post-service'
-          # tasks: 'build'
-          # publishJUnitResults: true
-          # testResultsFiles: '**/TEST-*.xml'
-          # javaHomeOption: 'JDKVersion'
+          tasks: 'build'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          javaHomeOption: 'JDKVersion'
           sonarQubeRunAnalysis: true
-          # spotBugsAnalysis: false
 
 # - stage: SonarQube Publish
 #   jobs:
