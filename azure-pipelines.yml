@@ -47,7 +47,7 @@ stages:
     - job: Build
       displayName: Gradle build job
       pool:
-        vmImage: $(vmImageName)
+        vmImage: Default
       steps:
       - task: Gradle@3
         inputs:
