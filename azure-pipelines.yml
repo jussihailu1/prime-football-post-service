@@ -35,7 +35,7 @@ stages:
       steps:
       - task: SonarQubePrepare@5
         inputs:
-          SonarQube: 'localhost:9000'
+          SonarQube: 'http://localhost:9000'
           scannerMode: 'Other'
           extraProperties: 'sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui'
       - task: SonarQubePublish@5
