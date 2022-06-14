@@ -25,47 +25,48 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
-- stage: SonarQube_prepare
-  jobs:
-  - job: Prepare
-    pool:
-      name: Default
-    steps:
-    - checkout: self
-      clean: true
-    - task: SonarQubePrepare@5
-      displayName: Prepare analysis on SonarQube
-      inputs:
-        SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
-        scannerMode: Other
-        extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
-
 - stage: Gradle_build_stage
-  displayName: Gradle build
+  displayName: Gradle build (and SonarQube)
   jobs:
+    - job: Prepare_SonarQube
+      displayName: SonarQube prepare
+      pool:
+        name: Default
+      steps:
+      - checkout: self
+        clean: true
+      - task: SonarQubePrepare@5
+        displayName: Prepare analysis on SonarQube
+        inputs:
+          SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
+          scannerMode: Other
+          extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
     - job: Build
       displayName: Gradle build job
       pool:
         name: Default
       steps:
+      # - task: Gradle@3
+      #   inputs:
+      #     gradleWrapperFile: 'post-service/gradlew'
+      #     workingDirectory: 'post-service'
+      #     sqAnalysisEnabled: true
+      #     sqGradlePluginVersionChoice: build
       - task: Gradle@3
         inputs:
           gradleWrapperFile: 'post-service/gradlew'
           workingDirectory: 'post-service'
-          sqAnalysisEnabled: true
-          sqGradlePluginVersionChoice: build
-          # javaHomeOption: 'JDKVersion'
-          # sonarQubeRunAnalysis: true
-          
-
-- stage: SonarQube_publish
-  jobs:
-  - job: Publish
-    pool:
-      name: Default
-    steps:
-    - task: SonarQubePublish@5
-      displayName: Publish Quality Gate Result
+          tasks: 'build'
+          javaHomeOption: 'JDKVersion'
+          sonarQubeRunAnalysis: true
+          sqGradlePluginVersionChoice: 'build'
+    - job: Publish_SonarQube
+      displayName: SonarQube publish
+      pool:
+        name: Default
+      steps:
+      - task: SonarQubePublish@5
+        displayName: Publish Quality Gate Result
 
 - stage: Docker_build_stage
   displayName: Docker build
