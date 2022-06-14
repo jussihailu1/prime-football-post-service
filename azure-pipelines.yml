@@ -39,7 +39,7 @@ stages:
           SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
           scannerMode: Other
           extraProperties: >-
-            sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
+            sonar.projectKey=Prime_Football_Prime_Football_AYFiw6eQu6r5al7Z7JP_
             sonar.login=admin
             sonar.password=root
       - task: Gradle@3
