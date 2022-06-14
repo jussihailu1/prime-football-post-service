@@ -19,5 +19,5 @@ fun PostDto.toPost() = Post(
     text,
     posterId,
     file,
-    timestamp!!
+    timestamp
 )
