@@ -40,8 +40,8 @@ stages:
           scannerMode: Other
           extraProperties: >-
             sonar.projectKey=Prime_Football_Prime_Football_AYFiw6eQu6r5al7Z7JP_
-            sonar.login=admin
-            sonar.password=root
+            # sonar.login=admin
+            # sonar.password=root
       - task: Gradle@3
         displayName: Gradle build
         inputs:
