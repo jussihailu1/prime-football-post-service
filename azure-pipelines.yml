@@ -28,8 +28,8 @@ stages:
 - stage: Gradle_build_stage
   displayName: Gradle build (and SonarQube)
   jobs:
-    - job: Prepare_SonarQube
-      displayName: SonarQube prepare
+    - job: SQ-prepare_Gradle-build_SQ-publish
+      displayName: SQ prepare > Gradle build > SQ publish
       pool:
         name: Default
       steps:
@@ -41,19 +41,8 @@ stages:
           SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
           scannerMode: Other
           extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
-    - job: Gradle_Build
-      displayName: Gradle build job
-      dependsOn: Prepare_SonarQube
-      pool:
-        name: Default
-      steps:
-      # - task: Gradle@3
-      #   inputs:
-      #     gradleWrapperFile: 'post-service/gradlew'
-      #     workingDirectory: 'post-service'
-      #     sqAnalysisEnabled: true
-      #     sqGradlePluginVersionChoice: build
       - task: Gradle@3
+        displayName: Gradle build
         inputs:
           gradleWrapperFile: 'post-service/gradlew'
           workingDirectory: 'post-service'
@@ -61,12 +50,6 @@ stages:
           javaHomeOption: 'JDKVersion'
           sonarQubeRunAnalysis: true
           sqGradlePluginVersionChoice: 'build'
-    - job: Publish_SonarQube
-      displayName: SonarQube publish
-      dependsOn: Gradle_Build
-      pool:
-        name: Default
-      steps:
       - task: SonarQubePublish@5
         displayName: Publish Quality Gate Result
 
