@@ -36,7 +36,7 @@ stages:
       # - checkout: self
       - task: SonarQubePrepare@5
         inputs:
-          SonarQube: 'Prime-Football Azure pipeline SonarQube connection'
+          SonarQube: Cool
           scannerMode: 'Other'
           extraProperties: |
             sonar.projectKey=PF_Pipeline_SonarQube_ProjectKey
