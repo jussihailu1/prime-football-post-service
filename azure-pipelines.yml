@@ -28,7 +28,7 @@ stages:
 - stage: Gradle_build_stage
   displayName: Gradle build (and SonarQube)
   jobs:
-    - job: SQ-prepare_Gradle-build_SQ-publish
+    - job: SQPrepare_GradleBuild_SQPublish
       displayName: SQ prepare > Gradle build > SQ publish
       pool:
         name: Default
