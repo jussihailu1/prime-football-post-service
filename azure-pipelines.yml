@@ -40,7 +40,6 @@ stages:
         scannerMode: Other
         extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
 
-
 - stage: Gradle_build_stage
   displayName: Gradle build
   jobs:
