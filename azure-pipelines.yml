@@ -44,7 +44,7 @@ stages:
       - task: Gradle@3
         displayName: Gradle build
         condition: 
-          if [[ "$CI_BRANCH_NAME" == main ]; then
+          if ("$CI_BRANCH_NAME" == main); then
             ./gradlew sonarqube
           fi
         inputs:
