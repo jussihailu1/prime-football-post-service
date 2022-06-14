@@ -33,8 +33,6 @@ stages:
       pool:
         name: Default
       steps:
-      # - checkout: self
-      #   clean: true
       - task: SonarQubePrepare@5
         displayName: Prepare analysis on SonarQube
         inputs:
