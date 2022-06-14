@@ -33,14 +33,21 @@ stages:
       pool:
         name: Default
       steps:
-      - checkout: self
-        clean: true
+      # - checkout: self
       - task: SonarQubePrepare@5
-        displayName: Prepare analysis on SonarQube
         inputs:
-          SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
-          scannerMode: Other
-          extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFeH-4s2p8R77HRNHui
+          SonarQube: Cool
+          scannerMode: 'Other'
+          extraProperties: |
+            sonar.projectKey=PF_Pipeline_SonarQube_ProjectKey
+            sonar.host.url=http://localhost:9000
+            sonar.login=c9e5ffb077f263cc3816a6bb31051055adf64773
+      # - task: SonarQubePrepare@5
+      #   displayName: Prepare analysis on SonarQube
+      #   inputs:
+      #     SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
+      #     scannerMode: Other
+      #     extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFiw6eQu6r5al7Z7JP_
       - task: Gradle@3
         displayName: Gradle build
         inputs:
