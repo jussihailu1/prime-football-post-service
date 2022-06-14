@@ -52,9 +52,11 @@ stages:
         inputs:
           gradleWrapperFile: 'post-service/gradlew'
           workingDirectory: 'post-service'
-          tasks: 'build'
-          javaHomeOption: 'JDKVersion'
+          sqAnalysisEnabled: true
+          sqGradlePluginVersionChoice: build
+          # javaHomeOption: 'JDKVersion'
           # sonarQubeRunAnalysis: true
+          
 
 - stage: SonarQube_publish
   jobs:
