@@ -10,5 +10,5 @@ import java.util.*
 @RequestMapping("/hello-posts")
 class RootController() {
     @GetMapping()
-    fun getTimeline(@PathVariable requesterId: UUID): String = "Prime Football Posts-service"
+    fun root(): String = "Prime Football Posts-service"
 }
