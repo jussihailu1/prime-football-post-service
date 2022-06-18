@@ -1,178 +1,173 @@
-# Deploy to Azure Kubernetes Service
-# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+variables:
+- name: BuildParameters.tasks
+  value: build
 
 trigger:
 - main
 
+name: $(date:yyyyMMdd)$(rev:.r)
+
 resources:
 - repo: self
 
-variables:
-
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '31e16c66-d1ff-4102-8941-019fc6932a62'
-  imageRepository: 'jussihailuprimefootballpostservice'
-  containerRegistry: 'primefootballregistry.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
-  imagePullSecret: 'primefootballregistryf844-auth'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
-
-  # Name of the new namespace being created to deploy the PR changes.
-  k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
-
 stages:
-- stage: Gradle_build_stage
-  displayName: Gradle build (and SonarQube)
+- stage: Gradle_Build_And_SonarQube
+  displayName: Gradle build + SonarQube
+  pool:
+    name: Default
   jobs:
-    - job: SQPrepare_GradleBuild_SQPublish
-      displayName: SQ prepare > Gradle build > SQ publish
-      pool:
-        name: Default
-      steps:
-      # - checkout: self
-      - task: SonarQubePrepare@5
-        inputs:
-          SonarQube: Cool
-          scannerMode: 'Other'
-          extraProperties: |
-            sonar.projectKey=PF_Pipeline_SonarQube_ProjectKey
-            sonar.host.url=http://localhost:9000
-            sonar.login=c9e5ffb077f263cc3816a6bb31051055adf64773
-      # - task: SonarQubePrepare@5
-      #   displayName: Prepare analysis on SonarQube
-      #   inputs:
-      #     SonarQube: c5b1d124-afbc-4007-8421-0987d65633a0
-      #     scannerMode: Other
-      #     extraProperties: sonar.projectKey=Prime_Football_Prime_Football_AYFiw6eQu6r5al7Z7JP_
-      - task: Gradle@3
-        displayName: Gradle build
-        inputs:
-          gradleWrapperFile: 'post-service/gradlew'
-          workingDirectory: 'post-service'
-          tasks: 'build'
-          javaHomeOption: 'JDKVersion'
-          sonarQubeRunAnalysis: true
-          sqGradlePluginVersionChoice: 'build'
-      - task: SonarQubePublish@5
-        displayName: Publish Quality Gate Result
+  - job: GradleBuild_And_SonarQube
+    displayName: Gradle build + SonarQube
+    steps:
+    - task: SonarQubePrepare@5
+      displayName: Prepare analysis on SonarQube
+      inputs:
+        SonarQube: f7d0c74c-b862-4a5a-8f53-3725c90c7a82
+        scannerMode: Other
+        extraProperties: sonar.projectKey=Prime_Football_prime-football-post-service_AYFjFsGf_FqXVwF7BJxB
+    - task: Gradle@2
+      displayName: gradlew build
+      inputs:
+        wrapperScript: post-service/gradlew
+        cwd: post-service
+        tasks: $(BuildParameters.tasks)
+        sqAnalysisEnabled: true
+        sqGradlePluginVersionChoice: build
+    - task: SonarQubePublish@5
+      displayName: Publish Quality Gate Result
 
-- stage: Docker_build_stage
-  displayName: Docker build
-  dependsOn: Gradle_build_stage
+- stage: DockerContainer_Build_And_Push
+  displayName: Docker container build and push [Docker Hub & ACR]
+  dependsOn: Gradle_Build_And_SonarQube
+  pool:
+    vmImage: 'ubuntu-latest'
   jobs:  
-  - job: Build
-    displayName: Docker build job
-    pool:
-      vmImage: $(vmImageName)
+  - job: 
+    displayName: Docker Hub build and push
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        repository: jussihailu/prime-football_post-service
+        dockerfile: '**/Dockerfile'
+        containerRegistry: 'Prime Football Post-service Docker Hub connection'
+        tags: Build.BuildId
+    - publish: manifests 
 
-    - upload: manifests
-      artifact: manifests
+# - stage: Snyk_Scan
+#   displayName: Snyk scan for dependency and dockerfile vulnerabilities
+#   pool:
+#     vMImage: 'ubuntu-latest'
+#   jobs:
+#     - job:
+#       displayName: Snyk scan dependencies
+#       steps:
+#         - task: SnykSecurityScan@1
+#           inputs:
+#             serviceConnectionEndpoint: 'Prime Football Post-service Snyk connection'
+#             testType: app
+#             monitorWhen: always
+#             failOnIssues: false
+#     - job:
+#       displayName: Snyk scan container
+#       steps:
+#         - task: SnykSecurityScan@1
+#           inputs:
+#             serviceConnectionEndpoint: 'Prime Football Post-service Snyk connection'
+#             testType: container
+#             dockerImageName: 'jussihailu/prime-football_post-service'
+#             dockerfilePath: 'post-service/Dockerfile'
+#             monitorWhen: always
+#             failOnIssues: true
 
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Docker_build_stage
-
+- stage: 
+  displayName: OWASP scan
+  pool:
+    vmImage: 'ubuntu-latest'
   jobs:
-  - deployment: Deploy
-    condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
-    displayName: Deploy
-    pool:
-      vmImage: $(vmImageName)
-    environment: 'jussihailu1primefootballpostservice.prime-football'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: $(imagePullSecret)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+    - job:
+      displayName: Generate Owasp report
+      steps:
+        - checkout: self
+        - bash: docker run -d -p 80:8080 jussihailu/prime-football_post-service
+          displayName: 'Run post-service container'
+        - task: owaspzap@1
+          inputs:
+            aggressivemode: true
+        
+        - bash: |
+            sudo npm install -g handlebars-cmd
 
-          - task: KubernetesManifest@0
-            displayName: Deploy to Kubernetes cluster
-            inputs:
-              action: deploy
-              manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
-              imagePullSecrets: |
-                $(imagePullSecret)
-              containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
+            cat <<EOF > owaspzap/nunit-template.hbs
 
-  - deployment: DeployPullRequest
-    displayName: Deploy Pull request
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/pull/'))
-    pool:
-      vmImage: $(vmImageName)
+            <test-run
+                id="2"
+                name="Owasp test"
+                start-time="{{@generated}}">
+                {{#each site}}<test-suite
+                    id="{{@index}}"
+                    type="Assembly"
+                    name="{{[@name]}}"
+                    result="Failed"
+                    failed="{{alerts.length}}">
+                    <attachments>
+                        <attachment>
+                            <filePath>$BUILD_SOURCESDIRECTORY/owaspzap/report.html</filePath>
+                        </attachment>
+                    </attachments>
+                    {{#each alerts}}<test-case
+                        id="{{@index}}"
+                        name="{{alert}}"
+                        result="Failed"
+                        fullname="{{alert}}"
+                        time="1">
+                        <failure>
+                            <message>
+                                <![CDATA[{{{desc}}}]]>
+                            </message>
+                            <stack-trace>
+                                <![CDATA[
+            Solution:
+            {{{solution}}}
 
-    environment: 'jussihailu1primefootballpostservice.$(k8sNamespaceForPR)'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - reviewApp: prime-football
+            Reference:
+            {{{reference}}}
 
-          - task: Kubernetes@1
-            displayName: 'Create a new namespace for the pull request'
-            inputs:
-              command: apply
-              useConfigurationFile: true
-              inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "$(k8sNamespaceForPR)" }}'
+            instances:{{#each instances}}
+            * {{uri}}
+                - {{method}}
+                {{#if evidence}}- {{{evidence}}}{{/if}}
+                                {{/each}}]]>
+                            </stack-trace>
+                        </failure>
+                    </test-case>
+                    {{/each}}
+                </test-suite>
+                {{/each}}
+            </test-run>
+            EOF
+          displayName: 'OWASP NUnit template'
 
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: $(imagePullSecret)
-              namespace: $(k8sNamespaceForPR)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+        - bash: ' handlebars owaspzap/report.json < owaspzap/nunit-template.hbs > owaspzap/test-results.xml'
+          displayName: 'generate nunit type file'
+          condition: always()
 
-          - task: KubernetesManifest@0
-            displayName: Deploy to the new namespace in the Kubernetes cluster
-            inputs:
-              action: deploy
-              namespace: $(k8sNamespaceForPR)
-              manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
-              imagePullSecrets: |
-                $(imagePullSecret)
-              containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
+        - task: PublishTestResults@2
+          displayName: 'Publish Test Results **/TEST-*.xml'
+          inputs:
+            testResultsFormat: NUnit
+            testResultsFiles: 'owaspzap/test-results.xml'
+          condition: always()
 
-          - task: Kubernetes@1
-            name: get
-            displayName: 'Get services in the new namespace'
-            continueOnError: true
-            inputs:
-              command: get
-              namespace: $(k8sNamespaceForPR)
-              arguments: svc
-              outputFormat: jsonpath='http://{.items[0].status.loadBalancer.ingress[0].ip}:{.items[0].spec.ports[0].port}'
+        - task: CopyFiles@2
+          condition: always()
+          inputs:
+            SourceFolder: 'owaspzap/'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-          # Getting the IP of the deployed service and writing it to a variable for posing comment
-          - script: |
-              url="$(get.KubectlOutput)"
-              message="Your review app has been deployed"
-              if [ ! -z "$url" -a "$url" != "http://:" ]
-              then
-                message="${message} and is available at $url.<br><br>[Learn More](https://aka.ms/testwithreviewapps) about how to test and provide feedback for the app."
-              fi
-              echo "##vso[task.setvariable variable=GITHUB_COMMENT]$message"
+        - task: PublishBuildArtifacts@1
+          condition: always()
+          inputs:
+            ArtifactName: 'owasp_zap_reports'
+
