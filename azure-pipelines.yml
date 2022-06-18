@@ -7,8 +7,8 @@ trigger:
 
 name: $(date:yyyyMMdd)$(rev:.r)
 
-# resources:
-# - repo: self
+resources:
+- repo: self
 
 stages:
 - stage: Gradle_Build_And_SonarQube
@@ -19,6 +19,7 @@ stages:
   - job: GradleBuild_And_SonarQube
     displayName: Gradle build + SonarQube
     steps:
+    - checkout: self
     - task: SonarQubePrepare@5
       displayName: Prepare analysis on SonarQube
       inputs:
