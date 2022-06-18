@@ -8,7 +8,7 @@ import com.primefootball.postservice.models.toPostDto
 import com.primefootball.postservice.models.toPostForTimelineDto
 import com.primefootball.postservice.repositories.PostRepository
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class PostService(private val postRepository: PostRepository) {
